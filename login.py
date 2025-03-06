@@ -5,13 +5,11 @@ import time
 import subprocess
 from termcolor import colored
 
-# Tentukan lokasi tersembunyi untuk menyimpan file konfigurasi
 HIDDEN_DIR = os.path.expanduser("~/.config/.myapp/")
 DB_FILE = os.path.join(HIDDEN_DIR, "users.json")
 SESSION_FILE = os.path.join(HIDDEN_DIR, "session.txt")
 WS_SCRIPT = "ws.py"
 
-# Pastikan folder tersembunyi ada
 os.makedirs(HIDDEN_DIR, exist_ok=True)
 
 def clear_screen():
