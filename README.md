@@ -54,7 +54,7 @@
 ## 🔥 **Cara Penggunaan**
 1. Jalankan tools:
    ```sh
-   python ws.py
+   python login.py
    ```
 2. Pilih mode scanning yang tersedia:  
    - **1⃣ API Recon** → Mencari endpoint API  
