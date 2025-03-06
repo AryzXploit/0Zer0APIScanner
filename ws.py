@@ -102,7 +102,7 @@ def scan():
     print(colored("Pilih jenis scanning:", "yellow"))
     print(colored("1. API Recon (Gau, Waybackurls, ParamSpider)", "cyan"))
     print(colored("2. JavaScript Analysis (LinkFinder, subjs, katana)", "cyan"))
-    print(colored("3. Secret Finder (SecretFinder, TruffleHog, GitLeaks)", "cyan"))
+    print(colored("3. Secret Finder (SecretFinder, TruffleHog)", "cyan"))
     print(colored("4. Full API Scan (BETA TEST)", "cyan"))
     print(colored("5. Clear Cache", "cyan"))
 
@@ -114,17 +114,19 @@ def scan():
     
     tasks = []
     if choice == "1":
-        check_tools(["gau", "waybackurls"])
+        check_tools(["gau", "waybackurls", "paramspider"])
         tasks.append(threading.Thread(target=run_command, args=(f"gau {domain} | tee {folder_path}/api_endpoints.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"waybackurls {domain} | tee -a {folder_path}/api_endpoints.txt",)))
+        tasks.append(threading.Thread(target=run_command, args=(f"paramspider --domain {domain} --output {folder_path}/params.txt",)))
     elif choice == "2":
-        check_tools(["katana", "subjs"])
+        check_tools(["katana", "subjs", "linkfinder"])
         tasks.append(threading.Thread(target=run_command, args=(f"katana -u https://{domain} -jc -o {folder_path}/js_files.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"subjs -i {folder_path}/js_files.txt | tee {folder_path}/js_api_endpoints.txt",)))
+        tasks.append(threading.Thread(target=run_command, args=(f"python3 ~/LinkFinder/linkfinder.py -i {folder_path}/js_files.txt -o cli",)))
     elif choice == "3":
-        check_tools(["trufflehog", "gitleaks"])
+        check_tools(["trufflehog", "secretfinder"])
+        tasks.append(threading.Thread(target=run_command, args=("cat | while read url ; do python3 ~/SecretFinder/SecretFinder.py -i $url -o cli ;done",)))
         tasks.append(threading.Thread(target=run_command, args=(f"trufflehog --regex --entropy=True --max_depth 10 {domain} | tee -a {folder_path}/secrets.txt",)))
-        tasks.append(threading.Thread(target=run_command, args=(f"gitleaks detect -s {domain} -r {folder_path}/git_leaks.txt",)))
     
     for task in tasks:
         task.start()
