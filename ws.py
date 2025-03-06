@@ -1,17 +1,12 @@
 import os
-import getpass
 import subprocess
-import time
 import sys
 import json
 import threading
 import random
 from termcolor import colored
-from shutil import which
 
 DB_FILE = "users.json"
-LOCKFILE = "/var/tmp/.cache_sys_zer0api.lock"
-LOCK_DURATION = 300  # 5 menit
 SESSION_FILE = "session.txt"
 
 ASCII_ART = """
@@ -38,15 +33,6 @@ QUOTES = [
     "0Zer0APIScanner – Mendeteksi yang tersembunyi, mengamankan yang rentan."
 ]
 
-TOOLS = {
-    "gau": "go install github.com/lc/gau/v2/cmd/gau@latest",
-    "waybackurls": "go install github.com/tomnomnom/waybackurls@latest",
-    "katana": "go install github.com/projectdiscovery/katana/cmd/katana@latest",
-    "subjs": "go install github.com/lc/subjs@latest",
-    "trufflehog": "pip install trufflehog",
-    "gitleaks": "go install github.com/gitleaks/gitleaks/v8@latest"
-}
-
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -59,7 +45,7 @@ def load_session():
 def run_command(command, output_file=None):
     """Jalankan command & simpan output ke file jika diberikan."""
     try:
-        result = subprocess.run(command, shell=True, text=True, capture_output=True)
+        result = subprocess.run(command.split(), text=True, capture_output=True)
         if output_file:
             with open(output_file, "w") as f:
                 f.write(result.stdout)
@@ -73,7 +59,11 @@ def scan():
     print(colored(f'"{random.choice(QUOTES)}"', "cyan"))
     print(colored("0Zer0APIScanner - API Recon & Secret Detection", "cyan"))
 
-    domain = input(colored("Masukkan Domain Target: ", "yellow"))
+    domain = input(colored("Masukkan Domain Target: ", "yellow")).strip()
+    if not domain:
+        print(colored("[X] Domain tidak boleh kosong!", "red"))
+        return
+
     folder_path = os.path.join(os.getcwd(), domain)
     os.makedirs(folder_path, exist_ok=True)
 
@@ -83,7 +73,7 @@ def scan():
     print(colored("3. Secret Finder (SecretFinder, TruffleHog, GitLeaks)", "cyan"))
     print(colored("4. Full API Scan (BETA TEST)", "cyan"))
 
-    choice = input(colored("Pilih mode (1-4): ", "yellow"))
+    choice = input(colored("Pilih mode (1-4): ", "yellow")).strip()
 
     tasks = []
 
@@ -97,10 +87,11 @@ def scan():
         tasks.append(threading.Thread(target=run_command, args=(f"trufflehog --regex --entropy=True --max_depth 10 {domain} | tee -a {folder_path}/secrets.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"gitleaks detect -s {domain} -r {folder_path}/git_leaks.txt",)))
     elif choice == "4":
-        for task in [1, 2, 3]:
+        for mode in ["1", "2", "3"]:
             scan()
+        return
     else:
-        print(colored("[!] Mode belum tersedia!", "red"))
+        print(colored("[!] Pilihan tidak valid!", "red"))
         return
 
     for task in tasks:
