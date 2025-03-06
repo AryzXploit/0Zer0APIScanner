@@ -51,13 +51,45 @@ def check_tools(tools):
     missing_tools = [tool for tool in tools if not which(tool)]
     if missing_tools:
         print(colored(f"[!] Alat berikut tidak ditemukan: {', '.join(missing_tools)}", "red"))
-        print(colored("[!] Silakan install sebelum melanjutkan!", "red"))
-        sys.exit(1)
+        install = input(colored("[?] Install otomatis? (y/n): ", "yellow")).strip().lower()
+        if install == "y":
+            for tool in missing_tools:
+                subprocess.run(f"sudo apt install -y {tool}", shell=True)
+        else:
+            sys.exit(1)
 
 def run_command(command):
-    subprocess.run(command, shell=True)
+    try:
+        subprocess.run(command, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(colored(f"[!] Error saat menjalankan: {command}", "red"))
+        print(colored(str(e), "red"))
+
+def is_locked():
+    if os.path.exists(LOCKFILE):
+        lock_time = os.path.getmtime(LOCKFILE)
+        if time.time() - lock_time < LOCK_DURATION:
+            return True
+    return False
+
+def create_lock():
+    with open(LOCKFILE, "w") as f:
+        f.write(str(time.time()))
+
+def remove_lock():
+    if os.path.exists(LOCKFILE):
+        os.remove(LOCKFILE)
+
+def clear_cache():
+    remove_lock()
+    print(colored("[✔] Cache berhasil dibersihkan!", "green"))
 
 def scan():
+    if is_locked():
+        print(colored("[X] Scanner sedang berjalan, tunggu beberapa saat...", "red"))
+        sys.exit(1)
+    
+    create_lock()
     clear_screen()
     print(colored(ASCII_ART, "cyan"))
     print(colored(f'"{random.choice(QUOTES)}"', "cyan"))
@@ -72,9 +104,14 @@ def scan():
     print(colored("2. JavaScript Analysis (LinkFinder, subjs, katana)", "cyan"))
     print(colored("3. Secret Finder (SecretFinder, TruffleHog, GitLeaks)", "cyan"))
     print(colored("4. Full API Scan (BETA TEST)", "cyan"))
+    print(colored("5. Clear Cache", "cyan"))
 
-    choice = input(colored("Pilih mode (1-4): ", "yellow")).strip()
-
+    choice = input(colored("Pilih mode (1-5): ", "yellow")).strip()
+    
+    if choice == "5":
+        clear_cache()
+        return
+    
     tasks = []
     if choice == "1":
         check_tools(["gau", "waybackurls"])
@@ -88,33 +125,19 @@ def scan():
         check_tools(["trufflehog", "gitleaks"])
         tasks.append(threading.Thread(target=run_command, args=(f"trufflehog --regex --entropy=True --max_depth 10 {domain} | tee -a {folder_path}/secrets.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"gitleaks detect -s {domain} -r {folder_path}/git_leaks.txt",)))
-    elif choice == "4":
-        for mode in ["1", "2", "3"]:
-            scan()
-        return
-    else:
-        print(colored("[!] Pilihan tidak valid!", "red"))
-        return
-
+    
     for task in tasks:
         task.start()
     for task in tasks:
         task.join()
 
+    remove_lock()
     print(colored(f"[+] Scan selesai! Hasil disimpan di {folder_path}", "green"))
 
 def main():
-    clear_screen()
-    username = load_session()
-    if not username:
-        print(colored("[X] Access Denied! Silakan login terlebih dahulu.", "red"))
-        print(colored("Jalankan `python3 login.py` untuk masuk.", "yellow"))
-        sys.exit(1)
-
-    print(colored(ASCII_ART, "cyan"))
-    print(WARNING_TEXT)
-    print(colored(f"[✔] Selamat datang, {username}!", "green"))
-    print(colored("Memulai 0Zer0APIScanner...", "blue"))
+    if "--clear-cache" in sys.argv:
+        clear_cache()
+        sys.exit(0)
     scan()
 
 if __name__ == "__main__":
