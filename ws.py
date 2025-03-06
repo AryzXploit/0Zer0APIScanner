@@ -3,13 +3,31 @@ import getpass
 import subprocess
 import time
 import sys
-import random
+import json
 import threading
+import random
 from termcolor import colored
 from shutil import which
 
+DB_FILE = "users.json"
 LOCKFILE = "/var/tmp/.cache_sys_zer0api.lock"
 LOCK_DURATION = 300  # 5 menit
+SESSION_FILE = "session.txt"
+
+ASCII_ART = """
+███████╗███████╗██████╗  ██████╗  █████╗ ██████╗
+██╔════╝██╔════╝██╔══██╗██╔════╝ ██╔══██╗██╔══██╗
+███████╗█████╗  ██████╔╝██║  ███╗███████║██████╔╝
+╚════██║██╔══╝  ██╔══██╗██║   ██║██╔══██║██╔══██╗
+███████║███████╗██████╔╝╚██████╔╝██║  ██║██║  ██║
+╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+"""
+
+WARNING_TEXT = colored("""
+[WARNING]
+Jangan gunakan alat ini untuk tujuan ilegal!
+Gunakan dengan tanggung jawab dan etika yang benar.
+""", "red", attrs=["bold"])
 
 QUOTES = [
     "Keamanan API adalah prioritas utama dalam dunia cybersecurity.",
@@ -32,60 +50,11 @@ TOOLS = {
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def check_lock():
-    if os.path.exists(LOCKFILE):
-        with open(LOCKFILE, "r") as f:
-            lock_time = int(f.read().strip())
-        current_time = int(time.time())
-
-        if current_time - lock_time < LOCK_DURATION:
-            remaining = LOCK_DURATION - (current_time - lock_time)
-            print(colored(f"[X] Tools terkunci! Tunggu {remaining} detik.", "red"))
-            exit(1)
-        else:
-            os.remove(LOCKFILE)
-
-def install_tools():
-    """Cek dan install semua tools yang dibutuhkan."""
-    print(colored("[+] Mengecek dependencies...", "cyan"))
-    for tool, install_cmd in TOOLS.items():
-        if which(tool) is None:
-            print(colored(f"[!] {tool} tidak ditemukan, menginstall...", "yellow"))
-            subprocess.run(install_cmd, shell=True)
-        else:
-            print(colored(f"[✔] {tool} sudah terinstall!", "green"))
-
-def animate_verification():
-    sys.stdout.write(colored("Verifying password", "cyan"))
-    sys.stdout.flush()
-    for _ in range(3):
-        time.sleep(1)
-        sys.stdout.write(colored(".", "cyan"))
-        sys.stdout.flush()
-    print(colored(" Done!", "green"))
-    time.sleep(1)
-
-def login():
-    check_lock()
-    password = "user"
-    attempts = 3
-
-    while attempts > 0:
-        user_input = getpass.getpass(colored("Masukkan Password: ", "yellow"))
-        if user_input == password:
-            animate_verification()
-            print(colored("Verification successful! Welcome home, sir", "cyan"))
-            time.sleep(2)
-            break
-        else:
-            attempts -= 1
-            print(colored(f"Password salah! Kesempatan tersisa: {attempts}", "red"))
-            if attempts == 0:
-                print(colored("Terlalu banyak percobaan! Tools terkunci 5 menit!", "red"))
-                with open(LOCKFILE, "w") as f:
-                    f.write(str(int(time.time())))
-                exit(1)
-    clear_screen()
+def load_session():
+    if os.path.exists(SESSION_FILE):
+        with open(SESSION_FILE, "r") as f:
+            return f.read().strip()
+    return None
 
 def run_command(command, output_file=None):
     """Jalankan command & simpan output ke file jika diberikan."""
@@ -103,7 +72,7 @@ def scan():
     clear_screen()
     print(colored(f'"{random.choice(QUOTES)}"', "cyan"))
     print(colored("0Zer0APIScanner - API Recon & Secret Detection", "cyan"))
-    
+
     domain = input(colored("Masukkan Domain Target: ", "yellow"))
     folder_path = os.path.join(os.getcwd(), domain)
     os.makedirs(folder_path, exist_ok=True)
@@ -115,19 +84,16 @@ def scan():
     print(colored("4. Full API Scan (BETA TEST)", "cyan"))
 
     choice = input(colored("Pilih mode (1-4): ", "yellow"))
-    
+
     tasks = []
 
     if choice == "1":
         tasks.append(threading.Thread(target=run_command, args=(f"gau {domain} | tee {folder_path}/api_endpoints.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"waybackurls {domain} | tee -a {folder_path}/api_endpoints.txt",)))
-        tasks.append(threading.Thread(target=run_command, args=(f"python3 ParamSpider.py --domain {domain} --output {folder_path}/api_parameters.txt",)))
     elif choice == "2":
         tasks.append(threading.Thread(target=run_command, args=(f"katana -u https://{domain} -jc -o {folder_path}/js_files.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"subjs -i {folder_path}/js_files.txt -o {folder_path}/js_api_endpoints.txt",)))
-        tasks.append(threading.Thread(target=run_command, args=(f"python3 linkfinder.py -i {folder_path}/js_files.txt -o cli | tee {folder_path}/js_links.txt",)))
     elif choice == "3":
-        tasks.append(threading.Thread(target=run_command, args=(f"python3 SecretFinder.py -i {folder_path}/js_files.txt -o cli | tee {folder_path}/secrets.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"trufflehog --regex --entropy=True --max_depth 10 {domain} | tee -a {folder_path}/secrets.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"gitleaks detect -s {domain} -r {folder_path}/git_leaks.txt",)))
     elif choice == "4":
@@ -146,8 +112,16 @@ def scan():
 
 def main():
     clear_screen()
-    install_tools()
-    login()
+    username = load_session()
+    if not username:
+        print(colored("[X] Access Denied! Silakan login terlebih dahulu.", "red"))
+        print(colored("Jalankan `python3 login.py` untuk masuk.", "yellow"))
+        sys.exit(1)
+
+    print(colored(ASCII_ART, "cyan"))
+    print(WARNING_TEXT)
+    print(colored(f"[✔] Selamat datang, {username}!", "green"))
+    print(colored("Memulai 0Zer0APIScanner...", "blue"))
     scan()
 
 if __name__ == "__main__":
