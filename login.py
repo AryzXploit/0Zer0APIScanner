@@ -1,14 +1,18 @@
 import os
 import getpass
 import json
-import sys
 import time
 import subprocess
 from termcolor import colored
 
-DB_FILE = "users.json"
-SESSION_FILE = "session.txt"
+# Tentukan lokasi tersembunyi untuk menyimpan file konfigurasi
+HIDDEN_DIR = os.path.expanduser("~/.config/.myapp/")
+DB_FILE = os.path.join(HIDDEN_DIR, "users.json")
+SESSION_FILE = os.path.join(HIDDEN_DIR, "session.txt")
 WS_SCRIPT = "ws.py"
+
+# Pastikan folder tersembunyi ada
+os.makedirs(HIDDEN_DIR, exist_ok=True)
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -25,7 +29,7 @@ def save_users(users):
 
 def register():
     users = load_users()
-    username = input(colored("🔑 Masukkan username: ", "yellow")).strip()
+    username = input(colored("\U0001F511 Masukkan username: ", "yellow")).strip()
     if username in users:
         print(colored("❌ Username sudah terdaftar!", "red"))
         return
