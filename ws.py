@@ -1,16 +1,21 @@
 import os
+import getpass
 import subprocess
+import time
 import sys
 import json
 import threading
 import random
 from termcolor import colored
+from shutil import which
 
 DB_FILE = "users.json"
+LOCKFILE = "/var/tmp/.cache_sys_zer0api.lock"
+LOCK_DURATION = 300  # 5 menit
 SESSION_FILE = "session.txt"
 
 ASCII_ART = """
-███████╗███████╗██████╗  ██████╗  █████╗ ██████╗
+███████╗███████╗██████╗  ██████╗  ██████╗ ██████╗
 ██╔════╝██╔════╝██╔══██╗██╔════╝ ██╔══██╗██╔══██╗
 ███████╗█████╗  ██████╔╝██║  ███╗███████║██████╔╝
 ╚════██║██╔══╝  ██╔══██╗██║   ██║██╔══██║██╔══██╗
@@ -42,29 +47,24 @@ def load_session():
             return f.read().strip()
     return None
 
-def run_command(command, output_file=None):
-    """Jalankan command & simpan output ke file jika diberikan."""
-    try:
-        result = subprocess.run(command.split(), text=True, capture_output=True)
-        if output_file:
-            with open(output_file, "w") as f:
-                f.write(result.stdout)
-        return result.stdout.strip()
-    except Exception as e:
-        print(colored(f"[X] Error: {e}", "red"))
-        return ""
+def check_tools(tools):
+    missing_tools = [tool for tool in tools if not which(tool)]
+    if missing_tools:
+        print(colored(f"[!] Alat berikut tidak ditemukan: {', '.join(missing_tools)}", "red"))
+        print(colored("[!] Silakan install sebelum melanjutkan!", "red"))
+        sys.exit(1)
+
+def run_command(command):
+    subprocess.run(command, shell=True)
 
 def scan():
     clear_screen()
+    print(colored(ASCII_ART, "cyan"))
     print(colored(f'"{random.choice(QUOTES)}"', "cyan"))
     print(colored("0Zer0APIScanner - API Recon & Secret Detection", "cyan"))
 
     domain = input(colored("Masukkan Domain Target: ", "yellow")).strip()
-    if not domain:
-        print(colored("[X] Domain tidak boleh kosong!", "red"))
-        return
-
-    folder_path = os.path.join(os.getcwd(), domain)
+    folder_path = os.path.join("results", domain)
     os.makedirs(folder_path, exist_ok=True)
 
     print(colored("Pilih jenis scanning:", "yellow"))
@@ -76,14 +76,16 @@ def scan():
     choice = input(colored("Pilih mode (1-4): ", "yellow")).strip()
 
     tasks = []
-
     if choice == "1":
+        check_tools(["gau", "waybackurls"])
         tasks.append(threading.Thread(target=run_command, args=(f"gau {domain} | tee {folder_path}/api_endpoints.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"waybackurls {domain} | tee -a {folder_path}/api_endpoints.txt",)))
     elif choice == "2":
+        check_tools(["katana", "subjs"])
         tasks.append(threading.Thread(target=run_command, args=(f"katana -u https://{domain} -jc -o {folder_path}/js_files.txt",)))
-        tasks.append(threading.Thread(target=run_command, args=(f"subjs -i {folder_path}/js_files.txt -o {folder_path}/js_api_endpoints.txt",)))
+        tasks.append(threading.Thread(target=run_command, args=(f"subjs -i {folder_path}/js_files.txt | tee {folder_path}/js_api_endpoints.txt",)))
     elif choice == "3":
+        check_tools(["trufflehog", "gitleaks"])
         tasks.append(threading.Thread(target=run_command, args=(f"trufflehog --regex --entropy=True --max_depth 10 {domain} | tee -a {folder_path}/secrets.txt",)))
         tasks.append(threading.Thread(target=run_command, args=(f"gitleaks detect -s {domain} -r {folder_path}/git_leaks.txt",)))
     elif choice == "4":
