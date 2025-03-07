@@ -1,90 +1,88 @@
-# 0Zer0APIScanner
+# **0Zer0APIScanner** 🚀  
 
-![GitHub Repo](https://img.shields.io/badge/GitHub-0Zer0APIScanner-blue?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Active-green?style=flat-square)
-![Contributions](https://img.shields.io/badge/Contributions-Welcome-orange?style=flat-square)
+![Hack The Planet](https://img.shields.io/badge/Hack-The%20Planet-red?style=flat-square)  
+![APIs Beware](https://img.shields.io/badge/APIs-Beware-orange?style=flat-square)  
+![Status](https://img.shields.io/badge/Status-Still%20Alive-green?style=flat-square)  
+![Contributions](https://img.shields.io/badge/Contributions-Hell%20Yeah!-yellow?style=flat-square)  
 
-## 🛠 Everything Can Be Hacked 🔥
+## **💀 Siap Nyolong API?**  
+🚨 **WARNING:** Hanya untuk **pentest** & **bug bounty**, kalau dipakai buat jahil, siap-siap dijemput FBI 🚔🌪️  
 
-**0Zer0APIScanner** adalah tools otomatis untuk melakukan reconnaissance terhadap API, mencari endpoint tersembunyi, dan mendeteksi **secrets** (API keys, token, credentials) yang mungkin bocor.
-
----
-
-## 🎯 **Fitur**
-✅ **API Recon**: Mengumpulkan endpoint API menggunakan `gau`, `waybackurls`, dan `ParamSpider`  
-✅ **JavaScript Analysis**: Menemukan API dari file `.js` menggunakan `subjs`, `katana`, dan `linkfinder`  
-✅ **Secret Finder**: Mendeteksi API keys dan credentials menggunakan `trufflehog` & `gitleaks`  
-✅ **Full API Scan**: Jalankan semua fitur di atas dalam satu perintah  
+### **Apa ini?**  
+💡 **0Zer0APIScanner** = senjata otomatis buat nyari API tersembunyi, nyedot endpoint, dan ngendus **secrets** (API keys, token, credentials) yang bocor!  
 
 ---
 
-## 🚀 **Instalasi**
-### 📌 **Di Linux (Ubuntu, Kali, Parrot, dll.)**
-1. Clone repository:
-   ```sh
-   git clone https://github.com/AryzXploit/0Zer0APIScanner.git
-   cd 0Zer0APIScanner
-   ```
-2. Install dependencies:
-   ```sh
-   sudo apt update && sudo apt install python3 python3-pip -y
-   pip install -r requirements.txt
-   ```
+## **🎯 Fitur Gokil:**  
+✅ **API Recon** → Kumpulin semua endpoint API yang bisa ditemukan 🕵️‍♂️  
+✅ **JavaScript Analysis** → Ngebongkar `.js` buat nyari API tersembunyi 🤓  
+✅ **Secret Finder** → Nyium bau API keys yang lupa disembunyiin 🤫  
+✅ **Full API Scan** → **Klik satu tombol, biarin tools kerja sendiri!** 🔥  
 
 ---
 
-### 📌 **Di Termux (Android)**
-1. Update dan install Python:
-   ```sh
-   pkg update && pkg upgrade
-   pkg install python git -y
-   ```
-2. Clone repository:
-   ```sh
-   git clone https://github.com/AryzXploit/0Zer0APIScanner.git
-   cd 0Zer0APIScanner
-   ```
-3. Install dependencies:
-   ```sh
-   pip install -r requirements.txt
-   ```
+## **👅 Cara Instalasi**  
+
+### **📌 Linux (Ubuntu, Kali, Parrot, dll.)**  
+```sh
+git clone https://github.com/AryzXploit/0Zer0APIScanner.git
+cd 0Zer0APIScanner
+sudo apt update && sudo apt install python3 python3-pip -y
+pip install -r requirements.txt
+```
+
+### **📌 Termux (Android)**  
+```sh
+pkg update && pkg upgrade
+pkg install python git -y
+git clone https://github.com/AryzXploit/0Zer0APIScanner.git
+cd 0Zer0APIScanner
+pip install -r requirements.txt
+```
 
 ---
 
-## 🔥 **Cara Penggunaan**
-1. Jalankan tools:
+## **🔥 Cara Pakai (Easy Mode)**  
+1️⃣ **Jalankan tools:**  
    ```sh
    python login.py
-   ```
-2. Pilih mode scanning yang tersedia:  
-   - **1⃣ API Recon** → Mencari endpoint API  
-   - **2⃣ JavaScript Analysis** → Menganalisis file `.js`  
-   - **3⃣ Secret Finder** → Mendeteksi API keys & credentials  
-   - **4⃣ Full API Scan** → Scan semua fitur sekaligus  
+   ```  
+2️⃣ **Pilih mode scanning:**  
+   - **1️⃣ API Recon** → Cari endpoint API  
+   - **2️⃣ JavaScript Analysis** → Bongkar file `.js`  
+   - **3️⃣ Secret Finder** → Cari API keys yang kebocoran  
+   - **4️⃣ Full API Scan** → GAS semua fitur sekaligus!  
 
-3. Masukkan **domain target**, lalu tunggu hasilnya!
-
----
-
-## 🛠 **Dependencies**
-- Python3
-- `gau`, `waybackurls`, `katana`, `subjs`, `trufflehog`, `gitleaks`
-- `pip install -r requirements.txt`
+3️⃣ **Masukkan domain target, trus tinggal nunggu hasilnya!**  
 
 ---
 
-## 🏆 **Kontributor**
-🔥 **Muhammad Arya Arjuna Habibullah** (**AryzXploit**) - Developer & Bug Hunter  
-🔥 **Tim KaciwwSec** - Support & Testing  
-
-> 🚀 *Mau kontribusi? Pull request selalu terbuka!*  
+## **💀 Dependencies (Wajib Punya)**  
+- Python3  
+- `gau`, `waybackurls`, `katana`, `subjs`, `trufflehog`, `gitleaks`  
+- Install pake:  
+   ```sh
+   pip install -r requirements.txt
+   ```  
 
 ---
 
-## 📌 **Kontak & Sosial Media**
+## **💣 Dev & Contributors**  
+🔥 **Muhammad Arya Arjuna Habibullah** (**AryzXploit**) - **Dev utama & bug hunter kelas berat**  
+🔥 **Tim KaciwwSec** - **Support mental & tester eksperimen liar**  
+
+> **🚀 Pengen kontribusi? Pull request selalu diterima!** (kalo nggak error 👀)  
+
+---
+
+## **📌 Kontak & Sosial Media**  
 👨‍💻 **GitHub**: [AryzXploit](https://github.com/AryzXploit)  
 🌐 **Website**: [AryzXploit](https://lostsec.xyz)  
-📲 **Discord Server**: DM di GitHub untuk invite  
+📲 **Discord Server**: DM dulu di GitHub buat invite  
 
-🔥 **Everything Can Be Hacked!** 🔥
+---
+
+🔥 **"Hacking itu seni, bukan kejahatan. Kecuali kalau ketahuan."** 🔥  
+🔥 **Everything Can Be Hacked, kecuali Indomie. Itu sakral.** 🔥  
+
 
