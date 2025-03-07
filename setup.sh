@@ -25,11 +25,11 @@ echo -e "${RESET}"
 if [ -d "/data/data/com.termux" ]; then
     OS="termux"
     PKG_MANAGER="pkg"
-    echo -e "${CYAN}[+] Detected: Termux${RESET}"
+    echo -e "${CYAN}[+] Detected: Bocil Termux${RESET}"
 else
     OS="linux"
     PKG_MANAGER="sudo apt"
-    echo -e "${CYAN}[+] Detected: Kali Linux or other Debian-based OS${RESET}"
+    echo -e "${CYAN}[+] Detected: Linux Or Somelse${RESET}"
 fi
 
 install_tools() {
@@ -43,7 +43,7 @@ install_tools() {
         echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> ~/.bashrc
         source ~/.bashrc
     else
-        echo -e "${GREEN}[✔] Go already installed!${RESET}"
+        echo -e "${GREEN}[✔] Go udh keinstall!${RESET}"
     fi
 
     # Install ProjectDiscovery Tools
@@ -66,7 +66,7 @@ go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
     go install github.com/hakluke/hakrawler@latest
     git clone https://github.com/devanshbatham/ParamSpider.git $HOME/ParamSpider && pip install -r $HOME/ParamSpider/requirements.txt
 
-    echo -e "${GREEN}[✔] Installation complete! Restart terminal atau run 'source ~/.bashrc'${RESET}"
+    echo -e "${GREEN}[✔] Instalasi Selesai Silahkan Jalankan Login.py${RESET}"
 }
 
 uninstall_tools() {
