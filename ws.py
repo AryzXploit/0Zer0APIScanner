@@ -99,7 +99,7 @@ def scan():
     os.makedirs(folder_path, exist_ok=True)
 
     print(colored("Pilih jenis scanning:", "yellow"))
-    print(colored("1. API Recon (Mencari endpoint api)", "cyan"))
+    print(colored("1. API Endpoint Recon (Mencari endpoint api)", "cyan"))
     print(colored("2. JavaScript Analysis (Recon Javascript file)", "cyan"))
     print(colored("3. Secret Finder (Find Secret apikey on javascript)", "cyan"))
     print(colored("4. Full API Scan (BETA TEST)", "cyan"))
@@ -124,7 +124,7 @@ def scan():
         tasks.append(threading.Thread(target=run_command, args=(f"python3 ~/LinkFinder/linkfinder.py -i {folder_path}/js_files.txt -o cli",)))
     elif choice == "3":
         check_tools(["trufflehog", "secretfinder"])
-        tasks.append(threading.Thread(target=run_command, args=("cat | while read url ; do python3 ~/SecretFinder/SecretFinder.py -i $url -o cli ;done",)))
+        tasks.append(threading.Thread(target=run_command, args=("cat | while read url ; do python3 ~/SecretFinder/SecretFinder.py -i -o result.html $url -o cli ;done",)))
         tasks.append(threading.Thread(target=run_command, args=(f"trufflehog --regex --entropy=True --max_depth 10 {domain} | tee -a {folder_path}/secrets.txt",)))
     
     for task in tasks:
@@ -133,7 +133,7 @@ def scan():
         task.join()
 
     remove_lock()
-    print(colored(f"[+] Scan selesai! Hasil disimpan di {folder_path}", "green"))
+    print(colored(f"[+] Hasil Scan Disini eak {folder_path}", "green"))
 
 def main():
     if "--clear-cache" in sys.argv:
