@@ -99,9 +99,9 @@ def scan():
     os.makedirs(folder_path, exist_ok=True)
 
     print(colored("Pilih jenis scanning:", "yellow"))
-    print(colored("1. API Recon (Gau, Waybackurls, ParamSpider)", "cyan"))
-    print(colored("2. JavaScript Analysis (LinkFinder, subjs, katana)", "cyan"))
-    print(colored("3. Secret Finder (SecretFinder, TruffleHog)", "cyan"))
+    print(colored("1. API Recon (Mencari endpoint api)", "cyan"))
+    print(colored("2. JavaScript Analysis (Recon Javascript file)", "cyan"))
+    print(colored("3. Secret Finder (Find Secret apikey on javascript)", "cyan"))
     print(colored("4. Full API Scan (BETA TEST)", "cyan"))
     print(colored("5. Clear Cache", "cyan"))
 
