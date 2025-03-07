@@ -45,7 +45,7 @@ pip install -r requirements.txt
 ## **🔥 Cara Pakai (Easy Mode)**  
 1️⃣ **Jalankan tools:**  
    ```sh
-   python login.py
+   bash setup.sh && python3 login.py
    ```  
 2️⃣ **Pilih mode scanning:**  
    - **1️⃣ API Recon** → Cari endpoint API  
